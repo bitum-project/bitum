@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Bitum
+Comment=Cross-platform GUI for Bitum.
+Exec=bitum %U
+Terminal=false
+Type=Application
+Icon=bitum
+MimeType=x-scheme-handler/bitum;
+Categories=Office;Finance;
