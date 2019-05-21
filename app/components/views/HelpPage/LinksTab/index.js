@@ -32,7 +32,7 @@ export const LinksTab = () => (
     <div className="tabbed-page-subtitle"><T id="help.subtitle.communications" m="Communications"/></div>
     <div className="help-icons-list">
       <HelpLink className={"help-forum-icon"} href="https://bitcointalk.org/index.php?topic=4887643" title={<T id="help.forum" m="Bitcointalk ANN" />} subtitle={<T id="help.forum.subtitle" m="bitcointalk.org/index.php?..."/>}/>
-      <HelpLink className={"help-discord-icon"} href="https://discordapp.com/invite/AUc79Gk" title={<T id="help.discord" m="Bitcointalk ANN" />} subtitle={<T id="help.discord.subtitle" m="discordapp.com/invite/AUc79Gk"/>}/>
+      <HelpLink className={"help-discord-icon"} href="https://discordapp.com/invite/AUc79Gk" title={<T id="help.discord" m="Discord" />} subtitle={<T id="help.discord.subtitle" m="discordapp.com/invite/AUc79Gk"/>}/>
       <HelpLink className={"help-telegram-icon"} href="https://t.me/bitum_en" title={<T id="help.telegram_en" m="Telegram EN" />} subtitle={<T id="help.telegram_en.subtitle" m="t.me/bitum_en"/>}/>
       <HelpLink className={"help-telegram-icon"} href="https://t.me/bitum_ru" title={<T id="help.telegram_ru" m="Telegram RU" />} subtitle={<T id="help.telegram_ru.subtitle" m="t.me/bitum_ru"/>}/>
       <HelpLink className={"help-telegram-icon"} href="https://t.me/bitum_asia" title={<T id="help.telegram_ch" m="Telegram CH" />} subtitle={<T id="help.telegram_ch.subtitle" m="t.me/bitum_asia"/>}/>
