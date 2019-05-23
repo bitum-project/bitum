@@ -111,11 +111,11 @@ Linux - ```~/.config/bitum/config.json```
 
 Run the following to start the Bitum daemon in a standalone terminal window:
 
-Windows - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19119 --rpccert=C:\Users\<username>\AppData\Local\Bitumd\rpc.cert```
+Windows - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19219 --rpccert=C:\Users\<username>\AppData\Local\Bitumd\rpc.cert```
 
-OSX - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19119 --rpccert=$HOME/Library/Application\ Support/Bitumd/rpc.cert```
+OSX - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19219 --rpccert=$HOME/Library/Application\ Support/Bitumd/rpc.cert```
 
-Linux - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19119 --rpccert=~/.bitumd/rpc.cert```
+Linux - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19219 --rpccert=~/.bitumd/rpc.cert```
 
 You can connect to this daemon in ```Advanced Startup => Different Local Daemon Location``` and input the parameters requested. Note that all the parameters needed are present in the command you used to start the node for your respective system.
 

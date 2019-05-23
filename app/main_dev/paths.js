@@ -29,14 +29,14 @@ export function getWalletsDirectoryPathNetwork(testnet) {
   return path.join(appDataDirectory(), "wallets", testnet ? "testnet" : "mainnet");
 }
 
-export function getWalletPath(testnet, walletPath = "", testnet3) {
-  const testnetStr = testnet ? "testnet" : "mainnet";
-  const testnet3Str = testnet3 === true ? "testnet3" : testnet3 === false ? "mainnet" : "";
-  return path.join(getWalletsDirectoryPath(), testnetStr, walletPath, testnet3Str);
+export function getWalletPath(testnet, walletPath = "") {
+  const network = testnet ? "testnet" : "mainnet";
+  const networkFolder = testnet ? "testnet" : "mainnet";
+  return path.join(getWalletsDirectoryPath(), network, walletPath, networkFolder);
 }
 
-export function getDefaultWalletDirectory(testnet, testnet3) {
-  return getWalletPath(testnet, "default-wallet", testnet3);
+export function getDefaultWalletDirectory(testnet) {
+  return getWalletPath(testnet, "default-wallet");
 }
 
 export function getDefaultWalletFilesPath(testnet, filePath = "") {
@@ -44,13 +44,11 @@ export function getDefaultWalletFilesPath(testnet, filePath = "") {
 }
 
 export function getWalletDBPathFromWallets(testnet, walletPath) {
-  const network = testnet ? "testnet" : "mainnet";
-  const networkFolder = testnet ? "testnet3" : "mainnet";
-  return path.join(getWalletsDirectoryPath(), network, walletPath, networkFolder, "wallet.db");
+  return path.join(getWalletsDirectoryPath(), testnet ? "testnet" : "mainnet", walletPath, testnet ? "testnet" : "mainnet", "wallet.db");
 }
 
 export function getBitumWalletDBPath(testnet) {
-  return path.join(appDataDirectory(), testnet ? "testnet3" : "mainnet", "wallet.db");
+  return path.join(appDataDirectory(), testnet ? "testnet" : "mainnet", "wallet.db");
 }
 
 export function bitumctlCfg(configPath) {
@@ -111,7 +109,7 @@ export function checkAndInitWalletCfg (testnet) {
 
     // check for existing mainnet directories
     if ( fs.pathExistsSync(getBitumWalletDBPath(testnet)) ) {
-      fs.copySync(getBitumWalletDBPath(testnet), path.join(getDefaultWalletDirectory(testnet, testnet),"wallet.db"));
+      fs.copySync(getBitumWalletDBPath(testnet), path.join(getDefaultWalletDirectory(testnet),"wallet.db"));
     }
 
     // copy over existing config.json if it exists

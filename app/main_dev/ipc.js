@@ -37,7 +37,7 @@ export const getAvailableWallets = (network) => {
 export const deleteDaemon = (appData, testnet) => {
   let removeDaemonDirectory = getBitumdPath();
   if (appData) removeDaemonDirectory = appData;
-  let removeDaemonDirectoryData = path.join(removeDaemonDirectory, "data", testnet ? "testnet3" : "mainnet");
+  let removeDaemonDirectoryData = path.join(removeDaemonDirectory, "data", testnet ? "testnet" : "mainnet");
   try {
     if (fs.pathExistsSync(removeDaemonDirectoryData)) {
       fs.removeSync(removeDaemonDirectoryData);

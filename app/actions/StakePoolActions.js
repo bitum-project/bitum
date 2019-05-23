@@ -238,7 +238,7 @@ export const addCustomStakePool = host => async (dispatch, getState) => {
     const data = resp.data.data;
     const poolInfo = {
       Host: host,
-      Network: data.Network === "mainnet" ? "mainnet" : "testnet", // needed because may return testnet2, testnet3, etc
+      Network: data.Network === "mainnet" ? "mainnet" : "testnet",
       APIVersionsSupported: data.APIVersionsSupported
     };
 
