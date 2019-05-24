@@ -23,7 +23,7 @@ export const MainNetParams = {
   TicketExpiry:            40960, // 5*TicketPoolSize
   CoinbaseMaturity:        256,
   SStxChangeMaturity:      1,
-  GenesisTimestamp:        1454954400,
+  GenesisTimestamp:        1557313819,
   TargetTimePerBlock:      5 * 60, // in seconds
   WorkDiffWindowSize: 144,
 
@@ -32,6 +32,6 @@ export const MainNetParams = {
   LegacyHDCoinType: 20,
   HDCoinType: 42,
 
-  TreasuryAddress: "Dcur2mcGjmENx4DhNqDctW5wJCVyT3Qeqkx",
+  TreasuryAddress: "B1xAWYg2eAyXhbetkLTMWmWN3Ub8AZfkeTq",
   trezorCoinName: "Bitum",
 };
