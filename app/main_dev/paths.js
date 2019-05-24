@@ -31,7 +31,7 @@ export function getWalletsDirectoryPathNetwork(testnet) {
 
 export function getWalletPath(testnet, walletPath = "", testnet3) {
   const testnetStr = testnet ? "testnet" : "mainnet";
-  const testnet3Str = testnet3 === true ? "testnet3" : testnet3 === false ? "mainnet" : "";
+  const testnet3Str = testnet3 === true ? "testnet" : testnet3 === false ? "mainnet" : "";
   return path.join(getWalletsDirectoryPath(), testnetStr, walletPath, testnet3Str);
 }
 
@@ -45,12 +45,12 @@ export function getDefaultWalletFilesPath(testnet, filePath = "") {
 
 export function getWalletDBPathFromWallets(testnet, walletPath) {
   const network = testnet ? "testnet" : "mainnet";
-  const networkFolder = testnet ? "testnet3" : "mainnet";
+  const networkFolder = testnet ? "testnet" : "mainnet";
   return path.join(getWalletsDirectoryPath(), network, walletPath, networkFolder, "wallet.db");
 }
 
 export function getBitumWalletDBPath(testnet) {
-  return path.join(appDataDirectory(), testnet ? "testnet3" : "mainnet", "wallet.db");
+  return path.join(appDataDirectory(), testnet ? "testnet" : "mainnet", "wallet.db");
 }
 
 export function bitumctlCfg(configPath) {
