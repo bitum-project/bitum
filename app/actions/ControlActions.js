@@ -486,9 +486,9 @@ export const publishUnminedTransactionsAttempt = () => (dispatch, getState) => {
   dispatch({ type: PUBLISHUNMINEDTRANSACTIONS_ATTEMPT });
   const { grpc: { unminedTransactions } } = getState();
   if (unminedTransactions && unminedTransactions.length > 0) {
-    wallet.publishUnminedTransactions(sel.walletService(getState()))
-      .then(() => dispatch({ type: PUBLISHUNMINEDTRANSACTIONS_SUCCESS }))
-      .catch(error => dispatch({ error, type: PUBLISHUNMINEDTRANSACTIONS_FAILED }));
+//    wallet.publishUnminedTransactions(sel.walletService(getState()))
+//      .then(() => dispatch({ type: PUBLISHUNMINEDTRANSACTIONS_SUCCESS }))
+//      .catch(error => dispatch({ error, type: PUBLISHUNMINEDTRANSACTIONS_FAILED }));
   }
 };
 
