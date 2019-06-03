@@ -1,7 +1,7 @@
 {
   "name": "bitum",
   "productName": "Bitum",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Cross-platform bitum gui based on Electron and React",
   "main": "./main.js",
   "author": {
