@@ -153,11 +153,11 @@ Linux - ```~/.config/bitum/config.json```
 
 Run the following to start the Bitum daemon in a standalone terminal window:
 
-Windows - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19119 --rpccert=C:\Users\<username>\AppData\Local\Bitumd\rpc.cert```
+Windows - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19219 --rpccert=C:\Users\<username>\AppData\Local\Bitumd\rpc.cert```
 
-macOS - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19119 --rpccert=$HOME/Library/Application\ Support/Bitumd/rpc.cert```
+macOS - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19219 --rpccert=$HOME/Library/Application\ Support/Bitumd/rpc.cert```
 
-Linux - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19119 --rpccert=~/.bitumd/rpc.cert```
+Linux - ```bitumd --testnet -u USER -P PASSWORD --rpclisten=127.0.0.1:19219 --rpccert=~/.bitumd/rpc.cert```
 
 Once you restart bitum, you should be presented with a screen to specify
 the node parameters. Note that all of them are present in the command you used
