@@ -12,7 +12,7 @@ Currently bitum is available on Windows, Linux, and macOS.
 Bitum will NOT use or in any way disrupt the CLI wallet file you may
 already be using at this time.
 
-Download the bitum release for your operating system on [bitum/bitum-binaries](https://github.com/bitum-project/bitum-binaries/releases).
+Download the bitum release for your operating system on [bitum-project/bitum-binaries](https://github.com/bitum-project/bitum-binaries/releases).
 
 On Fedora or similar distros you may need to install the libXScrnSaver
 package if you see this error:
