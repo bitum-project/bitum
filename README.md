@@ -1,6 +1,6 @@
 # bitum
 
-[![Build Status](https://travis-ci.org/bitum/bitum.png?branch=master)](https://travis-ci.org/bitum/bitum)
+[![Build Status](https://travis-ci.org/bitum-project/bitum.png?branch=master)](https://travis-ci.org/bitum-project/bitum)
 [![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
 
 bitum is a cross-platform GUI for bitum written in node.js using
@@ -294,10 +294,7 @@ yarn package-dev-linux
 
 If you have any further questions you can find us at:
 
-- irc.freenode.net (channel #bitum)
-- [webchat](https://webchat.freenode.net/?channels=bitum)
-- forum.bitum.io
-- bitum.slack.com
+- help@bitum.io
 
 ## Issue Tracker
 
