@@ -1,6 +1,5 @@
 # bitum
 
-[![Build Status](https://travis-ci.org/bitum-project/bitum.png?branch=master)](https://travis-ci.org/bitum-project/bitum)
 [![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
 
 bitum is a cross-platform GUI for bitum written in node.js using
