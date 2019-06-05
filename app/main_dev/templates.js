@@ -1,5 +1,3 @@
-import { app } from "electron";
-import { cleanShutdown, GetBitumdPID, GetBitumwPID } from "./launch";
 
 let versionWin = null;
 let grpcVersions = { requiredVersion: null, walletVersion: null };
@@ -37,7 +35,7 @@ const darwinTemplate = (mainWindow, locale) => [
       label: locale.messages["appMenu.quit"],
       accelerator: "Command+Q",
       click() {
-        cleanShutdown(mainWindow, app, GetBitumdPID(), GetBitumwPID());
+        mainWindow.webContents.send("check-auto-buyer-running");
       }
     } ]
   }, {

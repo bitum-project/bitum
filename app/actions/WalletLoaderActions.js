@@ -15,9 +15,11 @@ import { SpvSyncRequest, SyncNotificationType, RpcSyncRequest } from "../middlew
 import { push as pushHistory } from "react-router-redux";
 import { stopNotifcations } from "./NotificationActions";
 import { clearDeviceSession as trezorClearDeviceSession } from "./TrezorActions";
+import { ipcRenderer } from "electron";
 
 const MAX_RPC_RETRIES = 5;
 const RPC_RETRY_DELAY = 5000;
+const cliOptions = ipcRenderer.sendSync("get-cli-options");
 
 export const versionCheckAction = () => (dispatch) =>
   setTimeout(() => dispatch(getVersionServiceAttempt()), 2000);
@@ -208,27 +210,33 @@ export const startRpcRequestFunc = (isRetry, privPass) =>
     if (syncAttemptRequest) {
       return;
     }
-    const { daemon: { credentials, appData, walletName }, walletLoader: { discoverAccountsComplete,isWatchingOnly } }= getState();
+    const { daemon: { credentials, appdata, walletName }, walletLoader: { discoverAccountsComplete,isWatchingOnly } }= getState();
     const cfg = getWalletCfg(isTestNet(getState()), walletName);
     let rpcuser, rpccertPath, rpcpass, daemonhost, rpcport;
 
-    if(credentials) {
+    if (cliOptions.rpcPresent) {
+      rpcuser = cliOptions.rpcUser;
+      rpcpass = cliOptions.rpcPass;
+      rpccertPath = cliOptions.rpcCert;
+      daemonhost = cliOptions.rpcHost;
+      rpcport = cliOptions.rpcPort;
+    } else if (credentials) {
       rpcuser = credentials.rpc_user;
       rpccertPath = credentials.rpc_cert;
-      rpcpass = credentials.rpc_password;
+      rpcpass = credentials.rpc_pass;
       daemonhost = credentials.rpc_host;
       rpcport = credentials.rpc_port;
-    } else if (appData) {
+    } else if (appdata) {
       rpcuser = cfg.get("rpc_user");
       rpcpass = cfg.get("rpc_pass");
-      rpccertPath = `${appData}/rpc.cert`;
-      daemonhost = "127.0.0.1";
-      rpcport = "9209";
+      rpccertPath = `${appdata}/rpc.cert`;
+      daemonhost = cfg.get("rpc_host");
+      rpcport = cfg.get("rpc_port");
     } else {
       rpcuser = cfg.get("rpc_user");
       rpcpass = cfg.get("rpc_pass");
-      daemonhost = "127.0.0.1";
-      rpcport = "9209";
+      daemonhost = cfg.get("rpc_host");
+      rpcport = cfg.get("rpc_port");
     }
     var request = new RpcSyncRequest();
     const cert = getBitumdCert(rpccertPath);

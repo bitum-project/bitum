@@ -27,8 +27,20 @@ export const defaultFormats = {
     "day-short-month": {
       day: "numeric",
       month: "short"
+    },
+    "short-month": {
+      month: "short"
+    },
+    "short-month-24hour": {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+      formatMatcher: "best fit"
     }
-  }
+  },
 };
 
 const de = {

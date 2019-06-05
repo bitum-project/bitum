@@ -1,23 +1,21 @@
-import Status from "./Status";
-import StatusSmall from "./StatusSmall";
+import { Tooltip } from "shared";
+import { FormattedMessage as T } from "react-intl";
 import "style/TxHistory.less";
 
 const Row = ({
-  txAccountName, pending, txTimestamp, onClick, className, children, overview, tsDate
+  pending, onClick, className, children, overview,
 }) => {
-  const rowClsname = "tx-history-row";
-  const StatusComponent = overview ? StatusSmall : Status;
-  const overviewTxIsPending = overview && pending;
-
+  const overviewTxIsPending = overview && pending ? "is-row tx-overview-pending" : null;
 
   return (
-    <div className={[ "tx-history-row-wrapper", overviewTxIsPending ? "is-overview-pending" : null ].join(" ")}>
-      <div className={[ rowClsname, className,overviewTxIsPending ? "is-row-pending" : null ].join(" ")} {...{ onClick }}>
+    <div className={[ overview ? "tx-overview-row" : "tx-history-row is-row", overviewTxIsPending ].join(" ")}>
+      <div className={[ "tx-info", className ].join(" ")} {...{ onClick }}>
         {children}
-        {!overviewTxIsPending ?
-          <StatusComponent {...{ txAccountName, pending, txTimestamp, overview, tsDate }} /> : null}
       </div>
-      {overviewTxIsPending && <StatusComponent {...{ txAccountName, pending, txTimestamp, overview, onClick, tsDate }} />}
+      { pending &&
+        <Tooltip text={<T id="txHistory.Pending" m="Pending" />}>
+          <div className="pending-overview-details" onClick={onClick}/>
+        </Tooltip> }
     </div>
   );
 };

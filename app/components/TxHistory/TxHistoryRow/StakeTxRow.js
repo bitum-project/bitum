@@ -1,8 +1,9 @@
 import Row from "./Row";
-import { createElement as h } from "react";
 import { FormattedMessage as T } from "react-intl";
+import { createElement as h } from "react";
 import { Balance, Tooltip } from "shared";
 import { diffBetweenTwoTs } from "helpers/dateFormat";
+import { timeMessage } from "./index";
 
 const messageByType = { // TODO: use constants instead of string
   "vote": <T id="transaction.type.vote" m="Voted" />,
@@ -18,7 +19,7 @@ const messageByType = { // TODO: use constants instead of string
 };
 
 const StakeTxRow = ({ status,  ...props }) => {
-  const { overview, ticketPrice, ticketReward, leaveTimestamp, enterTimestamp } = props;
+  const { ticketPrice, ticketReward, leaveTimestamp, enterTimestamp, pending, txTs  } = props;
 
   const rewardLabel = <T id="history.ticket.rewardLabel" m="Ticket Reward" />;
   const ticketRewardMessage = <T id="history.ticket.rewardMesage"
@@ -50,38 +51,34 @@ const StakeTxRow = ({ status,  ...props }) => {
   const statusLower = status ? status.toLowerCase() : "";
   const typeMsg = messageByType[statusLower] || "(unknown type)";
 
-  return overview ?
-    (
-      <Row {...{ className: status, ...props }}>
-        <div className="transaction-info transaction-stake-info-overview">
-          <span className="icon" />
-          <span className="transaction-stake-type-overview">{typeMsg}</span>
-          <div className="transaction-info-price-reward">
-            <Tooltip text={ticketPriceMessage}>
-              <Balance classNameWrapper="stake-transaction-ticket-price" amount={ticketPrice} />
-            </Tooltip>
-            <Tooltip text={ticketRewardMessage}>
-              <Balance classNameWrapper="stake-transaction-ticket-reward" amount={ticketReward} noSmallAmount />
-            </Tooltip>
-            {daysToVote !== null && !isNaN(daysToVote) && (
-              <Tooltip text={daysToVoteMessage}>
-                <div className="transaction-info-overview-days-to-vote">
-                  <T id="statusSmall.daysToVotePlural" m="{days, plural, one {# day} other {# days}}"
-                    values={{ days: daysToVote }}/>
-                </div>
-              </Tooltip>
-            )}
-          </div>
-        </div>
-      </Row>
-    ) : (
-      <Row {...{ className: status , ...props }}>
-        <div className="transaction-info">
-          <span className="icon" />
-          <span className="transaction-stake-type">{typeMsg}</span>
-        </div>
-      </Row>
-    );
+  return (
+    <Row {...{ className: status, ...props }}>
+      <div className="is-row">
+        <span className="icon" />
+        <span className="transaction-stake-type-overview">{typeMsg}</span>
+        {!pending &&
+            <div className="transaction-time-date-spacer">
+              {timeMessage(txTs, props.intl)}
+            </div>}
+      </div>
+      <div className="transaction-info-price-reward">
+        <Tooltip text={ticketPriceMessage}>
+          <Balance classNameWrapper="stake-transaction-ticket-price" amount={ticketPrice} />
+        </Tooltip>
+        <Tooltip text={ticketRewardMessage}>
+          <Balance classNameWrapper="stake-transaction-ticket-reward" amount={ticketReward} noSmallAmount />
+        </Tooltip>
+        {daysToVote !== null && !isNaN(daysToVote) && (
+          <Tooltip text={daysToVoteMessage}>
+            <div className="transaction-info-overview-days-to-vote">
+              <T id="statusSmall.daysToVotePlural" m="{days, plural, one {# day} other {# days}}"
+                values={{ days: daysToVote }}/>
+            </div>
+          </Tooltip>
+        )}
+      </div>
+    </Row>
+  );
 };
 
 export const StakeTxRowOfType = (status) => {

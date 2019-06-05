@@ -19,7 +19,7 @@ const Logs = ({
   onHideBitumLogs,
 }
 ) => (
-  <Aux>
+  <>
     <div className="tabbed-page-subtitle"><T id="logs.subtitle" m="System Logs"/></div>
     {!isDaemonRemote && isDaemonStarted ?
       !showBitumdLogs ?
@@ -68,7 +68,7 @@ const Logs = ({
         </div>
       </div>
     }
-  </Aux>
+  </>
 );
 
 export default Logs;

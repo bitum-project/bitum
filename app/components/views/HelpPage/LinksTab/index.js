@@ -10,13 +10,13 @@ export const LinksTabHeader = () =>
   />;
 
 export const LinksTab = () => (
-  <Aux>
+  <>
     <div className="tabbed-page-subtitle"><T id="help.subtitle.project" m="Project Related"/></div>
     <div className="help-icons-list">
-      <HelpLink className={"help-github-icon"} href="https://github.com/bitum-project/bitum" title={<T id="help.github.title" m="Github"/>} subtitle={<T id="help.github.subtitle" m="github.com/bitum-project/bitum"/>} />
+      <HelpLink className={"help-github-icon"} href="https://github.com/bitum-project" title={<T id="help.github.title" m="Github"/>} subtitle={<T id="help.github.subtitle" m="github.com/bitum-project"/>} />
       <HelpLink className={"help-docs-icon"} href="https://docs.bitum.io" title={<T id="help.documentation" m="Documentation" />} subtitle={<T id="help.documentation.subtitle" m="docs.bitum.io"/>}/>
-      <HelpLink className={"help-stakepools-icon"} href="https://bitum.io/stakepools" title={<T id="help.stakepools" m=" Stakepools" />} subtitle={<T id="help.stakepools.subtitle" m="bitum.io/stakepools"/>}/>
-      <HelpLink className={"help-blockchain-explorer-icon"} href="https://explorer.bitum.io" title={<T id="help.blockchain" m=" Blockchain Explorer" />} subtitle={<T id="help.blockchain.subtitle" m="explorer.bitum.io"/>}/>
+      <HelpLink className={"help-stakepools-icon"} href="https://stake.bitum.io" title={<T id="help.stakepools" m="Stakepools" />} subtitle={<T id="help.stakepools.subtitle" m="stake.bitum.io"/>}/>
+      <HelpLink className={"help-blockchain-explorer-icon"} href="https://explorer.bitum.io" title={<T id="help.blockchain" m="Blockchain Explorer" />} subtitle={<T id="help.blockchain.subtitle" m="explorer.bitum.io"/>}/>
       <HelpLinkInfoModal className={"help-constitution-icon"}
         title={<T id="help.constitution" m="Constitution"/>}
         subtitle={<T id="help.constitution.subtitle" m="Bitum Project Constitution"/>}
@@ -38,5 +38,5 @@ export const LinksTab = () => (
       <HelpLink className={"help-telegram-icon"} href="https://t.me/bitum_asia" title={<T id="help.telegram_ch" m="Telegram CH" />} subtitle={<T id="help.telegram_ch.subtitle" m="t.me/bitum_asia"/>}/>
       <HelpLink className={"help-telegram-icon"} href="https://t.me/bitum_esp" title={<T id="help.telegram_es" m="Telegram ES" />} subtitle={<T id="help.telegram_es.subtitle" m="t.me/bitum_esp"/>}/>
     </div>
-  </Aux>
+  </>
 );

@@ -44,7 +44,7 @@ const Transaction = ({
   topNotification,
   progress
 }) => (
-  <Aux>
+  <>
     {topNotification &&
       <div className="snackbar-close-button-top" onClick={onDismissMessage}>
         <ProgressRing
@@ -54,7 +54,7 @@ const Transaction = ({
         />
       </div>}
     <div className="snackbar-information-row">
-      <div className="snackbar-information-row-type"><T id="notification.new" m="New Transaction" />, <span className="snackbar-information-row-type-bold">{messages[type]}</span></div>
+//      <div className="snackbar-information-row-type"><T id="notification.new" m="New Transaction"/>, <span className="snackbar-information-row-type-bold">{intl.formatMessage(messages[type])}</span></div>
       <div className="snackbar-information-row-amount">
         <Balance flat amount={message.amount}/>
       </div>
@@ -68,12 +68,12 @@ const Transaction = ({
     </div>
     }
     <div className="snackbar-information-row">
-      <div className="snackbar-information-row-type"><T id="notification.seeTransactionDetails" m="See Transaction Details" /></div>
+      <div className="snackbar-information-row-type"><T id="notification.seeTransactionDetails" m="See Transaction Details"/></div>
       <div className="snackbar-information-row-tx">
         <Tooltip width={300} text={`${message.txHash}`}><Link onClick={onDismissMessage} to={`/transactions/history/${message.txHash}`}>{message.txHash}</Link></Tooltip>
       </div>
     </div>
-  </Aux>
+  </>
 );
 
 export default injectIntl(Transaction);

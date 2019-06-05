@@ -11,6 +11,7 @@ import { EXTERNALREQUEST_STAKEPOOL_LISTING, EXTERNALREQUEST_POLITEIA, EXTERNALRE
 import { POLITEIA_URL_TESTNET, POLITEIA_URL_MAINNET } from "./middleware/politeiaapi";
 import { BITUMDATA_URL_TESTNET, BITUMDATA_URL_MAINNET } from "./middleware/bitumdataapi";
 import { dateToLocal, dateToUTC } from "./helpers/dateFormat";
+import { MIN_RELAY_FEE } from "main_dev/constants";
 import * as wallet from "wallet";
 
 const EMPTY_ARRAY = [];  // Maintaining identity (will) improve performance;
@@ -23,11 +24,13 @@ export const updateAvailable = get([ "daemon", "updateAvailable" ]);
 export const openForm = get([ "daemon", "openForm" ]);
 export const isDaemonRemote = get([ "daemon", "daemonRemote" ]);
 export const getDaemonStarted = get([ "daemon", "daemonStarted" ]);
+export const getDaemonConnected = get([ "daemon", "daemonConnected" ]);
 export const getRemoteAppdataError = get([ "daemon", "remoteAppdataError" ]);
 export const getCurrentBlockCount = get([ "daemon", "currentBlockCount" ]);
 export const getNeededBlocks = get([ "daemon", "neededBlocks" ]);
 export const getEstimatedTimeLeft = get([ "daemon", "timeLeftEstimate" ]);
 export const getDaemonSynced = get([ "daemon", "daemonSynced" ]);
+export const getDaemonTimeout = get([ "daemon", "daemonTimeout" ]);
 export const isAdvancedDaemon = get([ "daemon", "daemonAdvanced" ]);
 export const getWalletReady = get([ "daemon", "walletReady" ]);
 export const createNewWallet = get([ "walletLoader", "createNewWallet" ]);
@@ -465,6 +468,8 @@ export const totalValueOfLiveTickets = createSelector(
   }
 );
 
+export const ticketDataHeatmap = get([ "statistics", "ticketDataHeatmap" ]);
+
 export const ticketDataChart = createSelector(
   [ dailyBalancesStats, unitDivisor ],
   ( stats, unitDivisor ) => stats.map(s => ({
@@ -635,7 +640,7 @@ export const unsignedTransaction = createSelector(
 export const unsignedRawTx = createSelector([ constructTxResponse ], res => res && res.rawTx);
 
 export const estimatedFee = compose(
-  bytes => (bytes / 1000) * (0.001 * 100000000), estimatedSignedSize
+  bytes => (bytes / 1000) * (MIN_RELAY_FEE * 100000000), estimatedSignedSize
 );
 
 export const totalSpent = createSelector(
@@ -661,7 +666,6 @@ export const stakePoolListingEnabled = compose(
   l => l.indexOf(EXTERNALREQUEST_STAKEPOOL_LISTING) > -1,
   allowedExternalRequests
 );
-export const spvMode = get([ "settings", "currentSettings", "spvMode" ]);
 
 export const isSigningMessage = get([ "grpc", "getSignMessageRequestAttempt" ]);
 export const signMessageError = get([ "grpc", "getSignMessageError" ]);
@@ -921,6 +925,7 @@ export const stakeRewardsStats = createSelector(
 
 export const modalVisible = get([ "control", "modalVisible" ]);
 export const aboutModalMacOSVisible = get([ "control", "aboutModalMacOSVisible" ]);
+export const autobuyerRunningModalVisible = get([ "control", "autobuyerRunningModalVisible" ]);
 
 export const isTrezor = get([ "trezor", "enabled" ]);
 

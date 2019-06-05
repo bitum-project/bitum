@@ -1,10 +1,10 @@
 import { KeyBlueButton, InvisibleButton } from "buttons";
 import { FormattedMessage as T } from "react-intl";
 import { SeedCopyConfirmModal } from "modals";
-import { Tooltip } from "shared";
 import { LoaderBarBottom } from "indicators";
 import { Documentation } from "shared";
-import { BackBtnMsg, CreateWalletTitleMsg } from "../../messages";
+import WalletHeader from "./createWalletHeader";
+import { BackBtnMsg } from "../../messages";
 import "style/CreateWalletForm.less";
 
 const CreateWallet = ({
@@ -20,14 +20,9 @@ const CreateWallet = ({
   getEstimatedTimeLeft,
   getDaemonSynced,
 }) => (
-  <Aux>
+  <>
     <div className="getstarted content">
-      <div className="go-back-screen-button-area">
-        <Tooltip text={ <T id="createWallet.goBack" m="Go back" /> }><div className="go-back-screen-button" onClick={onReturnToWalletSelection}/></Tooltip>
-      </div>
-      <div className="content-title">
-        <CreateWalletTitleMsg />
-      </div>
+      <WalletHeader {...{ onBack: onReturnToWalletSelection }} />
       <Documentation name="WalletCreationWarning" className="create-wallet-warning" />
       <div className="seedArea">
         {mnemonic.split(" ").map((word, i) => {
@@ -58,7 +53,7 @@ const CreateWallet = ({
       onSubmit={onSubmitCopySeedConfirm}
       onCancelModal={onCancelCopySeedConfirm}
     />
-  </Aux>
+  </>
 );
 
 export default CreateWallet;

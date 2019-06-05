@@ -1,26 +1,31 @@
-import { bitumwalletCfg, getWalletPath, getExecutablePath, bitumdCfg, getBitumdRpcCert } from "./paths";
+import { bitumwalletCfg, getWalletPath, getExecutablePath, bitumdCfg, getBitumdPath } from "./paths";
 import { getWalletCfg, readBitumdConfig } from "../config";
 import { createLogger, AddToBitumdLog, AddToBitumwalletLog, GetBitumdLogs,
-  GetBitumwalletLogs, lastErrorLine, lastPanicLine, ClearBitumwalletLogs, CheckDaemonLogs } from "./logging";
+  GetBitumwalletLogs, lastErrorLine, lastPanicLine, ClearBitumwalletLogs } from "./logging";
 import parseArgs from "minimist";
 import { OPTIONS } from "./constants";
 import os from "os";
 import fs from "fs-extra";
+import util from "util";
+import { spawn } from "child_process";
+import isRunning from "is-running";
 import stringArgv from "string-argv";
-import { concat, isString } from "lodash";
+import { concat, isString } from "../fp";
+import webSocket from "ws";
 
 const argv = parseArgs(process.argv.slice(1), OPTIONS);
 const debug = argv.debug || process.env.NODE_ENV === "development";
 const logger = createLogger(debug);
 
-let bitumdPID;
-let bitumwPID;
+let bitumdPID, bitumwPID;
 
 // windows-only stuff
-let bitumwPipeRx;
-let bitumdPipeRx;
+let bitumwPipeRx, bitumwPipeTx, bitumdPipeRx, bitumwTxStream;
 
 let bitumwPort;
+let rpcuser, rpcpass, rpccert, rpchost, rpcport;
+
+let bitumdSocket = null;
 
 function closeClis() {
   // shutdown daemon and wallet.
@@ -32,7 +37,7 @@ function closeClis() {
 }
 
 export function closeBITUMD() {
-  if (require("is-running")(bitumdPID) && os.platform() != "win32") {
+  if (isRunning(bitumdPID) && os.platform() != "win32") {
     logger.log("info", "Sending SIGINT to bitumd at pid:" + bitumdPID);
     process.kill(bitumdPID, "SIGINT");
     bitumdPID = null;
@@ -51,12 +56,14 @@ export function closeBITUMD() {
 
 export const closeBITUMW = () => {
   try {
-    if (require("is-running")(bitumwPID) && os.platform() != "win32") {
+    if (isRunning(bitumwPID) && os.platform() != "win32") {
       logger.log("info", "Sending SIGINT to bitumwallet at pid:" + bitumwPID);
       process.kill(bitumwPID, "SIGINT");
-    } else if (require("is-running")(bitumwPID)) {
+    } else if (isRunning(bitumwPID)) {
       try {
         const win32ipc = require("../node_modules/win32ipc/build/Release/win32ipc.node");
+        bitumwTxStream.close();
+        win32ipc.closePipe(bitumwPipeTx);
         win32ipc.closePipe(bitumwPipeRx);
       } catch (e) {
         logger.log("error", "Error closing bitumwallet piperx: " + e);
@@ -82,7 +89,7 @@ export async function cleanShutdown(mainWindow, app) {
     logger.log("info", "Closing bitum.");
 
     let shutdownTimer = setInterval(function () {
-      const stillRunning = (require("is-running")(bitumdPID) && os.platform() != "win32");
+      const stillRunning = bitumdPID !== -1 && (isRunning(bitumdPID) && os.platform() != "win32");
 
       if (!stillRunning) {
         logger.log("info", "Final shutdown pause. Quitting app.");
@@ -101,24 +108,50 @@ export async function cleanShutdown(mainWindow, app) {
   });
 }
 
-export const launchBITUMD = (mainWindow, daemonIsAdvanced, daemonPath, appdata, testnet, reactIPC) => {
-  const spawn = require("child_process").spawn;
-  let args = [ "--nolisten" ];
-  let newConfig = {};
-  if (appdata) {
-    args.push(`--appdata=${appdata}`);
-    newConfig = readBitumdConfig(appdata, testnet);
-    newConfig.rpc_cert = getBitumdRpcCert(appdata);
-  } else {
-    args.push(`--configfile=${bitumdCfg(daemonPath)}`);
-    newConfig = readBitumdConfig(daemonPath, testnet);
-    newConfig.rpc_cert = getBitumdRpcCert();
+export const launchBITUMD = (params, testnet) => new Promise((resolve,reject) => {
+  let rpcCreds, appdata;
+
+  rpcCreds = params && params.rpcCreds;
+  appdata = params && params.appdata;
+
+  if (rpcCreds) {
+    rpcuser = rpcCreds.rpc_user;
+    rpcpass = rpcCreds.rpc_pass;
+    rpccert = rpcCreds.rpc_cert;
+    rpchost = rpcCreds.rpc_host;
+    rpcport = rpcCreds.rpc_port;
+    bitumdPID = -1;
+    return resolve(rpcCreds);
   }
+  if (bitumdPID === -1) {
+    const creds = {
+      rpc_user: rpcuser,
+      rpc_pass: rpcpass,
+      rpc_cert: rpccert,
+      rpc_host: rpchost,
+      rpc_port: rpcport,
+    };
+    return resolve(creds);
+  }
+
+  if (!appdata) appdata = getBitumdPath();
+
+  let args = [ "--nolisten" ];
+  const newConfig = readBitumdConfig(appdata, testnet);
+
+  args.push(`--configfile=${bitumdCfg(appdata)}`);
+  args.push(`--appdata=${appdata}`);
+
   if (testnet) {
     args.push("--testnet");
   }
+  rpcuser = newConfig.rpc_user;
+  rpcpass = newConfig.rpc_pass;
+  rpccert = newConfig.rpc_cert;
+  rpchost = newConfig.rpc_host;
+  rpcport = newConfig.rpc_port;
 
-  const bitumdExe = getExecutablePath("bitumd", argv.customBinPath);
+  const bitumdExe = getExecutablePath("bitumd", argv.custombinpath);
   if (!fs.existsSync(bitumdExe)) {
     logger.log("error", "The bitumd executable does not exist. Expected to find it at " + bitumdExe);
     return;
@@ -126,7 +159,6 @@ export const launchBITUMD = (mainWindow, daemonIsAdvanced, daemonPath, appdata, 
 
   if (os.platform() == "win32") {
     try {
-      const util = require("util");
       const win32ipc = require("../node_modules/win32ipc/build/Release/win32ipc.node");
       bitumdPipeRx = win32ipc.createPipe("out");
       args.push(util.format("--piperx=%d", bitumdPipeRx.readEnd));
@@ -138,53 +170,50 @@ export const launchBITUMD = (mainWindow, daemonIsAdvanced, daemonPath, appdata, 
   logger.log("info", `Starting ${bitumdExe} with ${args}`);
 
   const bitumd = spawn(bitumdExe, args, {
-    detached: os.platform() == "win32",
+    detached: os.platform() === "win32",
     stdio: [ "ignore", "pipe", "pipe" ]
   });
 
   bitumd.on("error", function (err) {
-    logger.log("error", "Error running bitumd.  Check logs and restart! " + err);
-    mainWindow.webContents.executeJavaScript("alert(\"Error running bitumd.  Check logs and restart! " + err + "\");");
-    mainWindow.webContents.executeJavaScript("window.close();");
+    reject(err);
   });
 
   bitumd.on("close", (code) => {
-    if (daemonIsAdvanced)
-      return;
     if (code !== 0) {
-      var lastBitumdErr = lastErrorLine(GetBitumdLogs());
-      if (!lastBitumdErr || lastBitumdErr == "") {
+      let lastBitumdErr = lastErrorLine(GetBitumdLogs());
+      if (!lastBitumdErr || lastBitumdErr === "") {
         lastBitumdErr = lastPanicLine(GetBitumdLogs());
-        console.log("panic error", lastBitumdErr);
       }
       logger.log("error", "bitumd closed due to an error: ", lastBitumdErr);
-      reactIPC.send("error-received", true, lastBitumdErr);
-    } else {
-      logger.log("info", `bitumd exited with code ${code}`);
+      return reject(lastBitumdErr);
     }
+
+    logger.log("info", `bitumd exited with code ${code}`);
   });
 
   bitumd.stdout.on("data", (data) => {
     AddToBitumdLog(process.stdout, data, debug);
-    if (CheckDaemonLogs(data)) {
-      reactIPC.send("warning-received", true, data.toString("utf-8"));
-    }
+    resolve(data.toString("utf-8"));
   });
-  bitumd.stderr.on("data", (data) => AddToBitumdLog(process.stderr, data, debug));
+
+  bitumd.stderr.on("data", (data) => {
+    AddToBitumdLog(process.stderr, data, debug);
+    reject(data.toString("utf-8"));
+  });
 
   newConfig.pid = bitumd.pid;
   bitumdPID = bitumd.pid;
   logger.log("info", "bitumd started with pid:" + newConfig.pid);
 
   bitumd.unref();
-  return newConfig;
-};
+  return resolve(newConfig);
+});
 
 // DecodeDaemonIPCData decodes messages from an IPC message received from bitumd/
 // bitumwallet using their internal IPC protocol.
 // NOTE: very simple impl for the moment, will break if messages get split
 // between data calls.
-const DecodeDaemonIPCData = (logger, data, cb) => {
+const DecodeDaemonIPCData = (data, cb) => {
   let i = 0;
   while (i < data.length) {
     if (data[i++] !== 0x01) throw "Wrong protocol version when decoding IPC data";
@@ -200,27 +229,52 @@ const DecodeDaemonIPCData = (logger, data, cb) => {
 };
 
 export const launchBITUMWallet = (mainWindow, daemonIsAdvanced, walletPath, testnet, reactIPC) => {
-  const spawn = require("child_process").spawn;
   let args = [ "--configfile=" + bitumwalletCfg(getWalletPath(testnet, walletPath)) ];
 
   const cfg = getWalletCfg(testnet, walletPath);
 
-  args.push("--ticketbuyer.nospreadticketpurchases");
-  args.push("--ticketbuyer.balancetomaintainabsolute=" + cfg.get("balancetomaintain"));
-  args.push("--addridxscanlen=" + cfg.get("gaplimit"));
+  args.push("--gaplimit=" + cfg.get("gaplimit"));
 
-  const bitumwExe = getExecutablePath("bitumwallet", argv.customBinPath);
+  const bitumwExe = getExecutablePath("bitumwallet", argv.custombinpath);
   if (!fs.existsSync(bitumwExe)) {
     logger.log("error", "The bitumwallet executable does not exist. Expected to find it at " + bitumwExe);
     return;
   }
 
+  const notifyGrpcPort = (port) => {
+    bitumwPort = port;
+    logger.log("info", "wallet grpc running on port", port);
+    mainWindow.webContents.send("bitumwallet-port", port);
+  };
+
+  const decodeBitumwIPC = data => DecodeDaemonIPCData(data, (mtype, payload) => {
+    if (mtype === "grpclistener") {
+      const intf = payload.toString("utf-8");
+      const matches = intf.match(/^.+:(\d+)$/);
+      if (matches) {
+        notifyGrpcPort(matches[1]);
+      } else {
+        logger.log("error", "GRPC port not found on IPC channel to bitumwallet: " + intf);
+      }
+    }
+  });
+
   if (os.platform() == "win32") {
     try {
-      const util = require("util");
       const win32ipc = require("../node_modules/win32ipc/build/Release/win32ipc.node");
       bitumwPipeRx = win32ipc.createPipe("out");
       args.push(util.format("--piperx=%d", bitumwPipeRx.readEnd));
+
+      bitumwPipeTx = win32ipc.createPipe("in");
+      args.push(util.format("--pipetx=%d", bitumwPipeTx.writeEnd));
+      args.push("--rpclistenerevents");
+      const pipeTxReadFd = win32ipc.getPipeEndFd(bitumwPipeTx.readEnd);
+      bitumwPipeTx.readEnd = -1; // -1 == INVALID_HANDLE_VALUE
+
+      bitumwTxStream = fs.createReadStream("", { fd: pipeTxReadFd });
+      bitumwTxStream.on("data", decodeBitumwIPC);
+      bitumwTxStream.on("error", (e) => e && e.code && e.code != "EOF" && logger.log("error", "tx stream error", e));
+      bitumwTxStream.on("close", () => logger.log("info", "bitumwallet tx stream closed"));
     } catch (e) {
       logger.log("error", "can't find proper module to launch bitumwallet: " + e);
     }
@@ -241,23 +295,9 @@ export const launchBITUMWallet = (mainWindow, daemonIsAdvanced, walletPath, test
     stdio: [ "ignore", "pipe", "pipe", "ignore", "pipe" ]
   });
 
-  const notifyGrpcPort = (port) => {
-    bitumwPort = port;
-    logger.log("info", "wallet grpc running on port", port);
-    mainWindow.webContents.send("bitumwallet-port", port);
-  };
-
-  bitumwallet.stdio[4].on("data", (data) => DecodeDaemonIPCData(logger, data, (mtype, payload) => {
-    if (mtype === "grpclistener") {
-      const intf = payload.toString("utf-8");
-      const matches = intf.match(/^.+:(\d+)$/);
-      if (matches) {
-        notifyGrpcPort(matches[1]);
-      } else {
-        logger.log("error", "GRPC port not found on IPC channel to bitumwallet: " + intf);
-      }
-    }
-  }));
+  if (os.platform() !== "win32") {
+    bitumwallet.stdio[4].on("data", decodeBitumwIPC);
+  }
 
   bitumwallet.on("error", function (err) {
     logger.log("error", "Error running bitumwallet.  Check logs and restart! " + err);
@@ -283,23 +323,7 @@ export const launchBITUMWallet = (mainWindow, daemonIsAdvanced, walletPath, test
 
   const addStdoutToLogListener = (data) => AddToBitumwalletLog(process.stdout, data, debug);
 
-  // waitForGrpcPortListener is added as a stdout on("data") listener only on
-  // win32 because so far that's the only way we found to get back the grpc port
-  // on that platform. For linux/macOS users, the --pipetx argument is used to
-  // provide a pipe back to bitum, which reads the grpc port in a secure and
-  // reliable way.
-  const waitForGrpcPortListener = (data) => {
-    const matches = /BITUMW: gRPC server listening on [^ ]+:(\d+)/.exec(data);
-    if (matches) {
-      notifyGrpcPort(matches[1]);
-      // swap the listener since we don't need to keep looking for the port
-      bitumwallet.stdout.removeListener("data", waitForGrpcPortListener);
-      bitumwallet.stdout.on("data", addStdoutToLogListener);
-    }
-    AddToBitumwalletLog(process.stdout, data, debug);
-  };
-
-  bitumwallet.stdout.on("data", os.platform() == "win32" ? waitForGrpcPortListener : addStdoutToLogListener);
+  bitumwallet.stdout.on("data", addStdoutToLogListener);
   bitumwallet.stderr.on("data", (data) => {
     AddToBitumwalletLog(process.stderr, data, debug);
   });
@@ -318,7 +342,6 @@ export const GetBitumdPID = () => bitumdPID;
 export const GetBitumwPID = () => bitumwPID;
 
 export const readExesVersion = (app, grpcVersions) => {
-  let spawn = require("child_process").spawnSync;
   let args = [ "--version" ];
   let exes = [ "bitumd", "bitumwallet", "bitumctl" ];
   let versions = {
@@ -327,7 +350,7 @@ export const readExesVersion = (app, grpcVersions) => {
   };
 
   for (let exe of exes) {
-    let exePath = getExecutablePath("bitumd", argv.customBinPath);
+    let exePath = getExecutablePath("bitumd", argv.custombinpath);
     if (!fs.existsSync(exePath)) {
       logger.log("error", "The bitumd executable does not exist. Expected to find it at " + exePath);
     }
@@ -354,3 +377,62 @@ export const readExesVersion = (app, grpcVersions) => {
 
   return versions;
 };
+
+// connectDaemon starts a new rpc connection to bitumd
+export const connectRpcDaemon = (mainWindow, rpcCreds) => {
+  const rpc_host = rpcCreds ? rpcCreds.rpc_host : rpchost;
+  const rpc_port = rpcCreds ? rpcCreds.rpc_port : rpcport;
+  const rpc_user = rpcCreds ? rpcCreds.rpc_user : rpcuser;
+  const rpc_pass = rpcCreds ? rpcCreds.rpc_pass : rpcpass;
+  const rpc_cert = rpcCreds ? rpcCreds.rpc_cert : rpccert;
+
+  var cert = fs.readFileSync(rpc_cert);
+  const url = `${rpc_host}:${rpc_port}`;
+  if (bitumdSocket && bitumdSocket.readyState === bitumdSocket.OPEN) {
+    return mainWindow.webContents.send("connectRpcDaemon-response", { connected: true });
+  }
+  bitumdSocket = new webSocket(`wss://${url}/ws`, {
+    headers: {
+      "Authorization": "Basic "+Buffer.from(rpc_user+":"+rpc_pass).toString("base64")
+    },
+    cert: cert,
+    ecdhCurve: "secp521r1",
+    ca: [ cert ]
+  });
+  bitumdSocket.on("open", function() {
+    logger.log("info","bitum has connected to bitumd instance");
+    return mainWindow.webContents.send("connectRpcDaemon-response", { connected: true });
+  });
+  bitumdSocket.on("error", function(error) {
+    logger.log("error",`Error: ${error}`);
+    return mainWindow.webContents.send("connectRpcDaemon-response", { connected: false, error });
+  });
+  bitumdSocket.on("message", function(data) {
+    const parsedData = JSON.parse(data);
+    const id = parsedData ? parsedData.id : "";
+    switch (id) {
+    case "getinfo":
+      mainWindow.webContents.send("check-getinfo-response", parsedData.result );
+      break;
+    case "getblockchaininfo": {
+      const dataResults = parsedData.result || {};
+      const blockCount = dataResults.blocks;
+      const syncHeight = dataResults.syncheight;
+      mainWindow.webContents.send("check-daemon-response", { blockCount, syncHeight });
+      break;
+    }
+    }
+  });
+  bitumdSocket.on("close", () => {
+    logger.log("info","bitum has disconnected to bitumd instance");
+  });
+};
+
+export const getDaemonInfo = () => bitumdSocket.send("{\"jsonrpc\":\"1.0\",\"id\":\"getinfo\",\"method\":\"getinfo\",\"params\":[]}");
+
+export const getBlockChainInfo = () => new Promise((resolve) => {
+  if (bitumdSocket && bitumdSocket.readyState === bitumdSocket.CLOSED) {
+    return resolve({});
+  }
+  bitumdSocket.send("{\"jsonrpc\":\"1.0\",\"id\":\"getblockchaininfo\",\"method\":\"getblockchaininfo\",\"params\":[]}");
+});

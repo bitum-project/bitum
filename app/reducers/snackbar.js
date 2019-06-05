@@ -40,7 +40,7 @@ import {
   GETSTARTUPSTATS_FAILED,
   GETMYTICKETSSTATS_FAILED,
 } from "actions/StatisticsActions";
-import { WALLETREMOVED_FAILED } from "actions/DaemonActions";
+import { WALLETREMOVED_FAILED, CONNECTDAEMON_FAILURE } from "actions/DaemonActions";
 import {
   GETWALLETSEEDSVC_FAILED,
   SPVSYNC_FAILED,
@@ -64,6 +64,7 @@ import {
 } from "actions/GovernanceActions";
 
 const WRONG_PASSPHRASE_MSG = "WRONG_PASSPHRASE_MSG";
+const ERROR_IS_OBJECT = "ERROR_IS_OBJECT";
 
 const messages = defineMessages({
   defaultSuccessMessage: {
@@ -182,6 +183,10 @@ const messages = defineMessages({
     id: "decodeRawTx.errors.decodeFailed",
     defaultMessage: "{originalError}"
   },
+  DAEMONCONNECTING_TIMEOUT: {
+    id: "daemonSyncingTimeout.errors",
+    defaultMessage: "Daemon connection timeout exceded.\n That Probably means you filled your parameters wrong. Please review it."
+  },
   REMOVESTAKEPOOLCONFIG: {
     id: "stakepools.removedStakePoolConfig",
     defaultMessage: "Successfully removed StakePool config"
@@ -228,7 +233,7 @@ const messages = defineMessages({
   },
   STARTTICKETBUYERV2_FAILED: {
     id: "runTicketBuyer.Failed",
-    defaultMessage: "Invalid private password.  Please try again."
+    defaultMessage: "Invalid private password. Please try again."
   },
   STOPTICKETBUYERV2_SUCCESS: {
     id: "stopTicketBuyer.Success",
@@ -285,11 +290,15 @@ const messages = defineMessages({
   TRZ_GETWALLETCREATIONMASTERPUBKEY_FAILED: {
     id: "trezor.getWalletCreationMasterPubKey.failed",
     defaultMessage: "Failed to obtain master extended pubkey from trezor device: {originalError}"
+  },
+  ERROR_IS_OBJECT: {
+    id: "snackbar.errorObject",
+    defaultMessage: "The following error happened: {error}"
   }
 });
 
 export default function snackbar(state = {}, action) {
-  let values, type, message;
+  let values, type, message, error;
 
   const oldMessages = state.messages || [];
 
@@ -414,15 +423,21 @@ export default function snackbar(state = {}, action) {
   case TRZ_UPDATEFIRMWARE_FAILED:
   case TRZ_NOCONNECTEDDEVICE:
   case TRZ_GETWALLETCREATIONMASTERPUBKEY_FAILED:
+    type = "Error";
     if (action.error && String(action.error).indexOf("wallet.Unlock: invalid passphrase:: secretkey.DeriveKey") > -1) {
       // intercepting all wrong passphrase errors, independently of which error
       // state was triggered. Not terribly pretty.
       message = messages[WRONG_PASSPHRASE_MSG];
+    } else if (String(action.error).indexOf("[object Object]") > -1) {
+      const keys = Object.keys(action.error);
+      error = keys.map(key => `${key}: ${action.error[key]}`);
+      message = messages[ERROR_IS_OBJECT];
+      values = { error };
+      break;
     } else {
       message = messages[action.type] || messages.defaultErrorMessage;
     }
 
-    type = "Error";
     values = { originalError: String(action.error) };
 
     // custom values for some error messages
@@ -437,13 +452,15 @@ export default function snackbar(state = {}, action) {
       // handled in an action.
       console.error(action.type, "\n", action.error);
     }
-
     break;
-
   case TRZ_TOGGLEPINPROTECTION_SUCCESS:
     type = "Success";
     message = messages["TRZ_TOGGLEPINPROTECTION_SUCCESS_" + (action.clearProtection ? "DISABLED" : "ENABLED")];
     values = { label: action.deviceLabel };
+    break;
+  case CONNECTDAEMON_FAILURE:
+    type = "Error";
+    action.daemonTimeout ? message = messages["DAEMONCONNECTING_TIMEOUT"] : message = action.error;
     break;
   }
 

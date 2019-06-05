@@ -10,13 +10,13 @@ const messages = defineMessages({
 
 const AppDataForm = ({
   setAppData,
-  appData,
+  appdata,
   appDataHasFailedAttempt,
   intl
 }) => {
 
   return (
-    <Aux>
+    <>
       <div className="advanced-daemon-row">
         <div className="advanced-daemon-label">
           <T id="login.form.appdata.label" m="Daemon Data Directory" />:
@@ -25,14 +25,14 @@ const AppDataForm = ({
           <PathBrowseInput
             required
             type="directory"
-            value={appData}
+            value={appdata}
             onChange={(value) => setAppData(value)}
             placeholder={intl.formatMessage(messages.appdataFieldPlaceholder)}
             showErrors={appDataHasFailedAttempt}
           />
         </div>
       </div>
-    </Aux>
+    </>
   );
 };
 

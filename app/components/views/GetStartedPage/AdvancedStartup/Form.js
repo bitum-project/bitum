@@ -27,14 +27,14 @@ const AdvancedBodyBase = ({
   rpcPortHasFailedAttempt,
   rpcCertHasFailedAttempt,
   appDataHasFailedAttempt,
-  appData,
+  appdata,
   intl,
   remoteValid,
   appDataValid,
   ...props,
 }) => {
   return (
-    <Aux>
+    <>
       <div className="advanced-page-toggle">
         <div className="text-toggle">
           <div className={"text-toggle-button-left " + (sideActive && "text-toggle-button-active")} onClick={!sideActive ? onShowAppData : null}>
@@ -70,7 +70,7 @@ const AdvancedBodyBase = ({
           <AppDataForm {...{
             ...props,
             setAppData,
-            appData,
+            appdata,
             appDataHasFailedAttempt,
             intl
           }} />
@@ -89,7 +89,7 @@ const AdvancedBodyBase = ({
           }
         </div>
       </div>
-    </Aux>
+    </>
   );
 };
 

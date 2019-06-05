@@ -31,7 +31,7 @@ const RemoteDaemonForm = ({
   setRpcHost,
   setRpcPort,
   rpc_user,
-  rpc_password,
+  rpc_pass,
   rpc_cert,
   rpc_host,
   rpc_port,
@@ -43,7 +43,7 @@ const RemoteDaemonForm = ({
   intl
 }) => {
   return (
-    <Aux>
+    <>
       <div className="advanced-daemon-row">
         <div className="advanced-daemon-label">
           <T id="advanced.remote.rpcuser" m="RPC User" />:
@@ -65,7 +65,7 @@ const RemoteDaemonForm = ({
         <div className="advanced-daemon-input">
           <PasswordInput
             required
-            value={rpc_password}
+            value={rpc_pass}
             onChange={(e) => setRpcPass(e.target.value)}
             placeholder={intl.formatMessage(messages.passphraseFieldPlaceholder)}
             showErrors={rpcPasswordHasFailedAttempt}
@@ -115,7 +115,7 @@ const RemoteDaemonForm = ({
           />
         </div>
       </div>
-    </Aux>
+    </>
   );
 };
 

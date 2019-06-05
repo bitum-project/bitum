@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Bitum
-Comment=Cross-platform GUI for Bitum.
+Comment=Bitum the Bitum wallet
 Exec=bitum %U
 Terminal=false
 Type=Application

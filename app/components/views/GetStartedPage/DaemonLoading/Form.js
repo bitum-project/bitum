@@ -36,13 +36,15 @@ const DaemonLoadingBody = ({
   syncFetchHeadersLastHeaderTime,
   syncFetchHeadersAttempt,
   daemonWarning,
+  walletName,
+  daemonTimeout,
   ...props,
 }) => (
   <div className="page-body getstarted">
     <div className="getstarted loader">
       <div className="loader-settings-logs">
         {updateAvailable && <UpdateAvailableLink updateAvailable={updateAvailable} /> }
-        <Aux>
+        <>
           <AboutModalButton { ...{ appVersion, updateAvailable } } />
           <InvisibleButton onClick={onShowSettings}>
             <SettingsLinkMsg />
@@ -50,9 +52,9 @@ const DaemonLoadingBody = ({
           <InvisibleButton onClick={onShowLogs}>
             <LogsLinkMsg />
           </InvisibleButton>
-        </Aux>
+        </>
       </div>
-      <Aux>
+      <>
         <div className="content-title">
           <LoaderTitleMsg />
         </div>
@@ -63,17 +65,20 @@ const DaemonLoadingBody = ({
           <WhatsNewLink {...{ onShowReleaseNotes, appVersion }} />
         </div>
         <div className="loader-bar">
-          <Aux>
+          <>
             <LinearProgressFull
               animationType={animationType}
               text={!text && isSPV ? <T id="getStarted.isSPV.loadingText" m="SPV mode activated, wallet ready to launch"/> : text}
               error={startupError}
               getDaemonSynced={getDaemonSynced}
-              disabled={(!getDaemonStarted || getCurrentBlockCount == null) && !isSPV}
+              disabled={(!getDaemonStarted || getCurrentBlockCount === null) && !isSPV}
               min={0}
               max={getNeededBlocks}
               value={getCurrentBlockCount}
             />
+            {daemonTimeout &&
+              <span className="warning"><T id="getStarted.daemon.isTimeout" m="Daemon connection timeout exceded."/></span>
+            }
             {!getDaemonStarted || getCurrentBlockCount == null || getDaemonSynced ?
               syncFetchHeadersAttempt &&
               <div className="loader-bar-estimation">
@@ -86,7 +91,7 @@ const DaemonLoadingBody = ({
                 <span className="bold"> {finishDateEstimation ? <FormattedRelative value={finishDateEstimation}/> : null} ({getCurrentBlockCount} / {getNeededBlocks})</span>
               </div>
             }
-          </Aux>
+          </>
         </div>
         <div className="loader-bar-icon">
           {startupError &&
@@ -96,7 +101,7 @@ const DaemonLoadingBody = ({
           }
         </div>
         {daemonWarning && getCurrentBlockCount <= 0 ?
-          <Aux>
+          <>
             <div className="get-started-last-log-lines">
               <div className="last-bitumwallet-log-line">{daemonWarning}</div>
             </div>
@@ -105,7 +110,7 @@ const DaemonLoadingBody = ({
                 <T id="getStarted.longWaitWarning" m="You are currently upgrading to a new bitumd version.  Typically, this one-time reindexing will take 30-45 minutes on an average machine."/>
               </div>
             </div>
-          </Aux>:
+          </>:
           <div/>
         }
         { Form && <Form {...{ ...props, openWalletInputRequest, startupError, getCurrentBlockCount, getDaemonSynced, isSPV }}/> }
@@ -135,12 +140,14 @@ const DaemonLoadingBody = ({
                 <ScanBtnMsg />
               </KeyBlueButton>
             </div>
-          </div> :
-          <div className="get-started-last-log-lines">
-            <div className="last-bitumwallet-log-line">{lastBitumwalletLogLine}</div>
-          </div>
+          </div> : (
+            walletName &&
+            <div className="get-started-last-log-lines">
+              <div className="last-bitumwallet-log-line">{lastBitumwalletLogLine}</div>
+            </div>
+          )
         }
-      </Aux>
+      </>
     </div>
   </div>
 );

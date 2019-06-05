@@ -1,8 +1,8 @@
 {
   "name": "bitum",
   "productName": "Bitum",
-  "version": "1.4.1",
-  "description": "Cross-platform bitum gui based on Electron and React",
+  "version": "1.4.2",
+  "description": "Bitum based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "main": "./main.js",
   "author": {
     "name": "Bitum Team",

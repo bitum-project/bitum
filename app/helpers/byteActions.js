@@ -84,5 +84,5 @@ export function str2utf8hex(str) {
 }
 
 export function hex2b64(hex) {
-  return Buffer.from(hex, "hex").toString("base64");
+  return new Buffer(hex, "hex").toString("base64");
 }

@@ -3,9 +3,10 @@ import {
   FINISH_TUTORIAL,
   FINISH_PRIVACY,
   FINISH_SPVCHOICE,
-  DAEMONSTARTED,
-  DAEMONSTARTED_REMOTE,
-  DAEMONSTARTED_APPDATA,
+  DAEMONSTART_SUCCESS,
+  CONNECTDAEMON_ATTEMPT,
+  CONNECTDAEMON_SUCCESS,
+  CONNECTDAEMON_FAILURE,
   DAEMONSYNCING_START,
   DAEMONSYNCING_PROGRESS,
   DAEMONSYNCED,
@@ -19,9 +20,8 @@ import {
   FATAL_DAEMON_ERROR,
   FATAL_WALLET_ERROR,
   DAEMON_WARNING,
-  WALLET_WARNING,
-  CLOSEDAEMON_ATTEMPT, CLOSEDAEMON_FAILED, CLOSEDAEMON_SUCCESS, NOT_SAME_CONNECTION,
-  NETWORK_MATCH
+  WALLET_WARNING, CLOSEDAEMON_ATTEMPT, CLOSEDAEMON_FAILED, CLOSEDAEMON_SUCCESS,
+  CHECK_NETWORKMATCH_ATTEMPT, CHECK_NETWORKMATCH_SUCCESS, CHECK_NETWORKMATCH_FAILED,
 } from "../actions/DaemonActions";
 import {
   CREATEWALLET_GOBACK,
@@ -33,10 +33,6 @@ import {
 
 export default function version(state = {}, action) {
   switch (action.type) {
-  case NETWORK_MATCH:
-    return { ... state,
-      networkMatch: true,
-    };
   case BITUM_VERSION:
     return { ...state,
       updateAvailable: action.msg,
@@ -58,28 +54,31 @@ export default function version(state = {}, action) {
     return { ...state,
       showPrivacy: false,
     };
-  case DAEMONSTARTED:
+  case DAEMONSTART_SUCCESS:
     return { ...state,
       daemonStarted: true,
-      daemonAdvanced: false,
       daemonStopped: false,
+      daemonAdvanced: action.daemonAdvanced,
       credentials: action.credentials,
+      daemonRemote: action.daemonRemote,
+      appdata: action.appdata,
+      daemonError: null,
     };
-  case DAEMONSTARTED_REMOTE:
+  case CONNECTDAEMON_ATTEMPT:
     return { ...state,
-      daemonStarted: true,
-      daemonAdvanced: false,
-      daemonStopped: false,
-      credentials: action.credentials,
-      daemonRemote: true,
+      daemonConnected: false,
+      daemonError: null,
     };
-  case DAEMONSTARTED_APPDATA:
+  case CONNECTDAEMON_SUCCESS:
     return { ...state,
-      daemonStarted: true,
-      daemonAdvanced: false,
-      daemonStopped: false,
-      appData: action.appData,
-      credentials: action.credentials,
+      daemonConnected: true,
+      daemonError: null,
+    };
+  case CONNECTDAEMON_FAILURE:
+    return { ...state,
+      daemonConnected: false,
+      daemonError: action.error,
+      daemonTimeout: action.daemonTimeout,
     };
   case CLOSEDAEMON_ATTEMPT:
     return { ...state,
@@ -99,7 +98,7 @@ export default function version(state = {}, action) {
       daemonAdvanced: action.advanced,
       daemonStopped: true,
       credentials: null,
-      appData: null,
+      appdata: null,
       daemonSynced: false,
       currentBlockCount: null,
       timeLeftEstimate: null,
@@ -108,6 +107,7 @@ export default function version(state = {}, action) {
     };
   case DAEMONSYNCING_START:
     return { ...state,
+      daemonStarted: true,
       currentBlockCount: action.currentBlockCount,
       timeStart: action.timeStart,
       blockStart: action.blockStart,
@@ -198,9 +198,18 @@ export default function version(state = {}, action) {
       ...state,
       walletError: action.error,
     };
-  case NOT_SAME_CONNECTION:
-    return {
-      ...state,
+  case CHECK_NETWORKMATCH_ATTEMPT:
+    return { ...state,
+      daemonError: null,
+      networkMatch: null,
+    };
+  case CHECK_NETWORKMATCH_SUCCESS:
+    return { ...state,
+      networkMatch: true,
+      daemonError: null,
+    };
+  case CHECK_NETWORKMATCH_FAILED:
+    return { ...state,
       daemonError: action.error,
     };
   default:
