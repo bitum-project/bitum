@@ -195,6 +195,7 @@
   "dependencies": {
     "autobind-decorator": "^2.1.0",
     "axios": "^0.18.0",
+    "bufferutil": "^4.0.1",
     "css-loader": "^1.0.1",
     "dom-helpers": "^3.4.0",
     "electron-builder": "^20.39.0",
@@ -235,6 +236,7 @@
     "stylelint": "^9.7.0",
     "timezone-mock": "^1.0.5",
     "trezor.js": "^6.17.6",
+    "utf-8-validate": "^5.0.2",
     "winston": "^2.3.1"
   },
   "optionalDependencies": {
