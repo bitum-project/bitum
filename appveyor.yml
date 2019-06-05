@@ -23,7 +23,7 @@ install:
   - go get -u -v github.com/bitum-project/bitumwallet
   - go get -u -v github.com/Masterminds/glide
   - go get -u github.com/golang/dep/cmd/dep
-  - cd %GOPATH%\\src\\github.com\\bitum\\bitumd
+  - cd %GOPATH%\\src\\github.com\\bitum-project\\bitumd
   - glide i
   - go install . ./cmd/bitumctl/
   - cd ../bitumwallet
