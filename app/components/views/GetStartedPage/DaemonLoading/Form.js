@@ -5,7 +5,7 @@ import { PasswordInput } from "inputs";
 import "style/GetStarted.less";
 import { LogsLinkMsg, SettingsLinkMsg, HeaderTimeMsg, DiscoverLabelMsg,
   DiscoverAccountsInfoMsg, ScanBtnMsg, LearnBasicsMsg, UpdateAvailableLink,
-  WhatsNewLink, LoaderTitleMsg, AboutModalButton, messages } from "../messages";
+  LoaderTitleMsg, AboutModalButton, messages } from "../messages";
 
 const DaemonLoadingBody = ({
   Form,
@@ -20,7 +20,6 @@ const DaemonLoadingBody = ({
   onShowSettings,
   onShowLogs,
   onShowTutorial,
-  onShowReleaseNotes,
   startupError,
   updateAvailable,
   appVersion,
@@ -62,7 +61,6 @@ const DaemonLoadingBody = ({
           <SlateGrayButton className="tutorial-button" onClick={onShowTutorial}>
             <LearnBasicsMsg />
           </SlateGrayButton>
-          <WhatsNewLink {...{ onShowReleaseNotes, appVersion }} />
         </div>
         <div className="loader-bar">
           <>

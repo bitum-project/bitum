@@ -36,8 +36,6 @@ export const UpdateAvailableLink = ({ updateAvailable }) => (
   </Tooltip>
 );
 
-export const WhatsNewLink = ({ onShowReleaseNotes, appVersion }) => ('');
-
 export const AboutModalButton = ({ appVersion, updateAvailable }) => (
   <AboutModalButtonInvisible
     version={appVersion}
