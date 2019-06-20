@@ -31,12 +31,15 @@ function closeClis() {
   // shutdown daemon and wallet.
   // Don't try to close if not running.
   if(bitumdPID && bitumdPID !== -1)
-    closeBITUMD(bitumdPID);
+    closeBITUMD();
   if(bitumwPID && bitumwPID !== -1)
-    closeBITUMW(bitumwPID);
+    closeBITUMW();
 }
 
 export function closeBITUMD() {
+  if (bitumdPID === -1) {
+    return true;
+  }
   if (isRunning(bitumdPID) && os.platform() != "win32") {
     logger.log("info", "Sending SIGINT to bitumd at pid:" + bitumdPID);
     process.kill(bitumdPID, "SIGINT");
@@ -55,6 +58,9 @@ export function closeBITUMD() {
 }
 
 export const closeBITUMW = () => {
+  if (bitumwPID === -1) {
+    return true;
+  }
   try {
     if (isRunning(bitumwPID) && os.platform() != "win32") {
       logger.log("info", "Sending SIGINT to bitumwallet at pid:" + bitumwPID);
