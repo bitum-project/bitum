@@ -110,11 +110,11 @@ export const startWallet = (mainWindow, daemonIsAdvanced, testnet, walletPath, r
 };
 
 export const stopDaemon = () => {
-  return closeBITUMD(GetBitumdPID());
+  return closeBITUMD();
 };
 
 export const stopWallet = () => {
-  return closeBITUMW(GetBitumwPID());
+  return closeBITUMW();
 };
 
 export const setWatchingOnlyWallet = (isWatchingOnly) => {
