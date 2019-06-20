@@ -213,9 +213,11 @@ const TxDetails = ({
           <div className="txdetails-input-arrow"></div>
           <div className="txdetails-outputs">
             <div className="txdetails-output-area">
+              /*
               <div className={txOutputs.length > 0 ? "txdetails-overview-title-consumed" : "txdetails-overview-title-empty"}>
                 <T id="txDetails.walletOutputs" m="Wallet Outputs" />
               </div>
+              */
               {txOutputs.map(({ accountName, address, amount }, idx) => (
                 <div key={idx} className="txdetails-row">
                   <div className="txdetails-address">{txDirection === "out" ? "change" : accountName ? addSpacingAroundText(accountName) : addSpacingAroundText(address)}</div>
@@ -223,6 +225,7 @@ const TxDetails = ({
                 </div>
               ))}
             </div>
+/*
             <div className="txdetails-output-area">
               <div className={nonWalletOutputs.length > 0 ? "txdetails-overview-title-consumed" : "txdetails-overview-title-empty"}>
                 <T id="txDetails.nonWalletOutputs" m="Non Wallet Outputs" />
@@ -234,6 +237,7 @@ const TxDetails = ({
                 </div>
               ))}
             </div>
+*/
           </div>
         </div>
       </div>
@@ -253,10 +257,12 @@ const TxDetails = ({
             </div>
           </>
         }
+/*
         <div className="txdetails-top-row">
           <div className="txdetails-name"><T id="txDetails.rawTransactionLabel" m="Raw Transaction" /></div>
           <div className="txdetails-value"><div className="txdetails-value-rawtx">{rawTx}</div><CopyToClipboard textToCopy={rawTx} className="receive-content-nest-copy-to-clipboard-icon" /></div>
         </div>
+*/
       </div>
     </StandalonePage>
   );
