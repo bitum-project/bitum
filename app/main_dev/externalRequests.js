@@ -95,7 +95,7 @@ export const allowExternalRequest = (externalReqType) => {
     addAllowedURL(/^https:\/\/api\.bitum\.io\/\?c=gsd$/);
     break;
   case EXTERNALREQUEST_UPDATE_CHECK:
-    addAllowedURL("https://api.github.com/repos/bitum-project/bitum/releases");
+    addAllowedURL("https://api.github.com/repos/bitum-project/bitum-binaries/releases");
     break;
   case EXTERNALREQUEST_POLITEIA:
     addAllowedURL(POLITEIA_URL_TESTNET);
