@@ -59,7 +59,7 @@ export const SYNC_DAEMON_FAILED = "SYNC_DAEMON_FAILED";
 
 export const checkBitumVersion = () => (dispatch, getState) =>{
   const detectedVersion = getState().daemon.appVersion;
-  const releaseApiURL = "https://api.github.com/repos/bitum-project/bitum/releases";
+  const releaseApiURL = "https://api.github.com/repos/bitum-project/bitum-binaries/releases";
   axios.get(releaseApiURL, { timeout: 5000 })
     .then(function (response) {
       const currentVersion = response.data[0].tag_name.split("v")[1];
