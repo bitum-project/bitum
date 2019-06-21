@@ -183,46 +183,6 @@ const TxDetails = ({
         </div> }
       </div>
       {!isConfirmed && <KeyBlueButton className="rebroadcast-button" onClick={publishUnminedTransactions}><T id="txDetails.rebroadcastTransactions" m="Rebroadcast Transaction"/></KeyBlueButton> }
-      <div className="txdetails-io">
-        <div className="txdetails-title"><T id="txDetails.io.title" m="I/O Details" /></div>
-        <div className="txdetails-overview">
-          <div className="txdetails-inputs">
-            <div className="txdetails-input-area">
-              <div className={txInputs.length > 0 ? "txdetails-overview-title-consumed" : "txdetails-overview-title-empty"}>
-                <T id="txDetails.walletInputs" m="Wallet Inputs" />
-              </div>
-              {txInputs.map(({ accountName, amount }, idx) => (
-                <div key={idx} className="txdetails-row">
-                  <div className="txdetails-address">{accountName}</div>
-                  <div className="txdetails-amount"><Balance amount={amount} /></div>
-                </div>
-              ))}
-            </div>
-            <div className="txdetails-input-area">
-              <div className={nonWalletInputs.length > 0 ? "txdetails-overview-title-consumed" : "txdetails-overview-title-empty"}>
-                <T id="txDetails.nonWalletInputs" m="Non Wallet Inputs" />
-              </div>
-              {nonWalletInputs.map(({ address, amount }, idx) => (
-                <div key={idx} className="txdetails-row">
-                  <div className="txdetails-address">{addSpacingAroundText(address)}</div>
-                  <div className="txdetails-amount"><Balance amount={amount} /></div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="txdetails-input-arrow"></div>
-          <div className="txdetails-outputs">
-            <div className="txdetails-output-area">
-              {txOutputs.map(({ accountName, address, amount }, idx) => (
-                <div key={idx} className="txdetails-row">
-                  <div className="txdetails-address">{txDirection === "out" ? "change" : accountName ? addSpacingAroundText(accountName) : addSpacingAroundText(address)}</div>
-                  <div className="txdetails-amount"><Balance amount={amount} /></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
       <div className="txdetails-details">
         <div className="txdetails-title"><T id="txDetails.properties" m="Properties" /></div>
         {isConfirmed &&
