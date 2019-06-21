@@ -17,7 +17,7 @@ export function getWalletCfg(testnet, walletPath){
 export function initWalletCfg(testnet, walletPath) {
   const config = new Store({ cwd: getWalletPath(testnet, walletPath) });
   if (!config.has("enableticketbuyer")) {
-    config.set("enableticketbuyer","0");
+    config.set("enableticketbuyer","1");
   }
   if (!config.has("balancetomaintain")) {
     config.set("balancetomaintain","0");
@@ -30,10 +30,10 @@ export function initWalletCfg(testnet, walletPath) {
     config.set("hiddenaccounts",hiddenAccounts);
   }
   if (!config.has("discoveraccounts")) {
-    config.set("discoveraccounts",true);
+    config.set("discoveraccounts", true);
   }
   if (!config.has("gaplimit")) {
-    config.set("gaplimit","20");
+    config.set("gaplimit", "20");
   }
   if (!config.has("iswatchonly")) {
     config.set("iswatchonly", false);
@@ -98,13 +98,13 @@ export function initGlobalCfg() {
     config.set("ui_animations", true);
   }
   if (!config.has("show_tutorial")) {
-    config.set("show_tutorial","true");
+    config.set("show_tutorial", false);
   }
   if (!config.has("show_privacy")) {
-    config.set("show_privacy", true);
+    config.set("show_privacy", false);
   }
   if (!config.has("show_spvchoice")) {
-    config.set("show_spvchoice", true);
+    config.set("show_spvchoice", false);
   }
   if (!config.has("allowed_external_requests")) {
     config.set("allowed_external_requests", []);
@@ -135,7 +135,7 @@ export function initGlobalCfg() {
     config.set("spv_connect", []);
   }
   if (!config.has("max_wallet_count")) {
-    config.set("max_wallet_count", 3);
+    config.set("max_wallet_count", 5);
   }
   if (!config.has("timezone")) {
     config.set("timezone", "local");
