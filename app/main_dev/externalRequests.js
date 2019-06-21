@@ -89,6 +89,7 @@ export const allowExternalRequest = (externalReqType) => {
   switch (externalReqType) {
   case EXTERNALREQUEST_NETWORK_STATUS:
     addAllowedURL("https://testnet.bitum.io/api/status");
+    addAllowedURL("https://mainnet.bitum.io/api/status");
     addAllowedURL("https://explorer.bitum.io/api/status");
     break;
   case EXTERNALREQUEST_STAKEPOOL_LISTING:
